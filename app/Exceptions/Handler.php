@@ -10,6 +10,8 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
+
+    use ExceptionTrait;
     /**
      * A list of the exception types that are not reported.
      *
@@ -45,20 +47,10 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception){
         
         if ($request->expectsJson()) {
-            if ($exception instanceof ModelNotFoundException) {
-                return response()->json([
-                    'errors' => 'Product Model not found'
-                ], 404);
-                // dd($exception);
-                return parent::render($request, $exception);
-            }
-
-            if ($exception instanceof NotFoundHttpException) {
-                return response()->json([
-                    'errors' => 'Inccorect route'
-                ], 404);
-            }
+          return $this->apiException($request, $exception);
         }
+
+        return parent::render($request, $exception);
 
     }
 }
