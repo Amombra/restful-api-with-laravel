@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProductRequest;
-use App\Http\Resources\Product\ProductCollection;
-use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
-use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ProductRequest;
+use Facade\FlareClient\Http\Response;
+use App\Exceptions\ProductNotBelongsToUser;
+use App\Http\Resources\Product\ProductResource;
+use App\Http\Resources\Product\ProductCollection;
 
 class ProductController extends Controller
 
@@ -40,6 +42,8 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, Product $product){
+
+        $this->ProductUserCheck($product);
         $request['detail'] = $request->detail;
         unset($request['detail']);
         $product->update($request->all());
@@ -51,5 +55,11 @@ class ProductController extends Controller
     public function destroy(Product $product){
         return $product->delete();
         return  response(null, 201);
+    }
+
+    public function ProductUserCheck($product){
+        if (Auth::id() !== $product->user_id) {
+            throw new ProductNotBelongsToUser;
+        }
     }
 }
