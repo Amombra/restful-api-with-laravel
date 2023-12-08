@@ -47,4 +47,9 @@ class ProductController extends Controller
             'data' => new ProductResource(($product))
         ], 201);
     }
+
+    public function destroy(Product $product){
+        return $product->delete();
+        return  response(null, 201);
+    }
 }
